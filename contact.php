@@ -38,7 +38,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             require_once dirname(__FILE__) . '/PHPMailer/src/Exception.php';
 
             $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
-            $mail->SMTPDebug = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;
+            $mail->SMTPDebug = \PHPMailer\PHPMailer\SMTP::DEBUG_CONNECTION;
             $mail->isSMTP();
             $mail->Host = '192.254.233.230';
             $mail->SMTPAuth = true;
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
 
             $mail->setFrom('website@sourceeq.com', 'Source EQ Website');
-            $mail->addAddress('jakariait@gmail.com');
+            $mail->addAddress('jakaria@sourceeq.com');
             $mail->addReplyTo($email, $name);
 
             $mail->Subject = 'New Contact Form Submission from ' . htmlspecialchars($name);
@@ -69,8 +69,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
             $mail->Body .= "\nMessage:\n" . htmlspecialchars($message);
 
-            $mail->send();
-            $success = 'Thank you! Your message has been sent. We will be in touch soon.';
+            if ($mail->send()) {
+                $success = 'Thank you! Your message has been sent. We will be in touch soon.';
+            } else {
+                $error = 'Failed to send email. Error: ' . $mail->ErrorInfo;
+            }
         }
     } catch (\PHPMailer\PHPMailer\Exception $e) {
         $error = 'Sorry, there was a problem sending your message. Please try again. Error: ' . $e->getMessage();
