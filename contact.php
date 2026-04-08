@@ -1,51 +1,81 @@
 <?php
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\SMTP;
+use PHPMailer\PHPMailer\Exception;
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+ini_set('log_errors', 1);
+
 $success = '';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $name = isset($_POST['name']) ? trim($_POST['name']) : '';
-    $email = isset($_POST['email']) ? trim($_POST['email']) : '';
-    $company = isset($_POST['company']) ? trim($_POST['company']) : '';
-    $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
-    $message = isset($_POST['message']) ? trim($_POST['message']) : '';
-    $recaptcha_response = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : '';
+    try {
+        $name = isset($_POST['name']) ? trim($_POST['name']) : '';
+        $email = isset($_POST['email']) ? trim($_POST['email']) : '';
+        $company = isset($_POST['company']) ? trim($_POST['company']) : '';
+        $phone = isset($_POST['phone']) ? trim($_POST['phone']) : '';
+        $message = isset($_POST['message']) ? trim($_POST['message']) : '';
+        $recaptcha_response = isset($_POST['g-recaptcha-response']) ? $_POST['g-recaptcha-response'] : '';
 
-    $secret_key = 'YOUR_SECRET_KEY_HERE';
+        $secret_key = '6LfEk6wsAAAAAL_MbbSHH43XkMioqDVmoq4lbTQY';
 
-    $verify = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret_key . '&response=' . $recaptcha_response);
-    $verify_data = json_decode($verify);
+        $verify = file_get_contents('https://www.google.com/recaptcha/api/siteverify?secret=' . $secret_key . '&response=' . $recaptcha_response);
+        $verify_data = json_decode($verify);
 
-    if (empty($name) || empty($email) || empty($message)) {
-        $error = 'Please fill in all required fields.';
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $error = 'Please enter a valid email address.';
-    } elseif (empty($recaptcha_response)) {
-        $error = 'Please complete the reCAPTCHA.';
-    } elseif (!$verify_data->success) {
-        $error = 'reCAPTCHA verification failed. Please try again.';
-    } else {
-        $to = 'info@sourceeq.com';
-        $subject = 'New Contact Form Submission from ' . htmlspecialchars($name);
-        
-        $body = "Name: " . htmlspecialchars($name) . "\n";
-        $body .= "Email: " . htmlspecialchars($email) . "\n";
-        if (!empty($company)) {
-            $body .= "Company: " . htmlspecialchars($company) . "\n";
-        }
-        if (!empty($phone)) {
-            $body .= "Phone: " . htmlspecialchars($phone) . "\n";
-        }
-        $body .= "\nMessage:\n" . htmlspecialchars($message);
-
-        $headers = "From: noreply@" . $_SERVER['HTTP_HOST'] . "\r\n";
-        $headers .= "Reply-To: " . htmlspecialchars($email) . "\r\n";
-        $headers .= "Content-Type: text/plain; charset=UTF-8\r\n";
-
-        if (mail($to, $subject, $body, $headers)) {
-            $success = 'Thank you! Your message has been sent. We will be in touch soon.';
+        if (empty($name) || empty($email) || empty($message)) {
+            $error = 'Please fill in all required fields.';
+        } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = 'Please enter a valid email address.';
+        } elseif (empty($recaptcha_response)) {
+            $error = 'Please complete the reCAPTCHA and try again.';
+        } elseif (!$verify_data->success) {
+            $error = 'reCAPTCHA verification failed. Please try again.';
         } else {
-            $error = 'Sorry, there was a problem sending your message. Please try again.';
+            require_once dirname(__FILE__) . '/PHPMailer/src/PHPMailer.php';
+            require_once dirname(__FILE__) . '/PHPMailer/src/SMTP.php';
+            require_once dirname(__FILE__) . '/PHPMailer/src/Exception.php';
+
+            $mail = new \PHPMailer\PHPMailer\PHPMailer(true);
+            $mail->SMTPDebug = \PHPMailer\PHPMailer\SMTP::DEBUG_SERVER;
+            $mail->isSMTP();
+            $mail->Host = '192.254.233.230';
+            $mail->SMTPAuth = true;
+            $mail->Username = 'website@sourceeq.com';
+            $mail->Password = 'G2Z%!F#k[P=v';
+            $mail->SMTPSecure = 'tls';
+            $mail->Port = 587;
+            $mail->SMTPOptions = array(
+                'ssl' => array(
+                    'verify_peer' => false,
+                    'verify_peer_name' => false,
+                    'allow_self_signed' => true
+                )
+            );
+
+            $mail->setFrom('website@sourceeq.com', 'Source EQ Website');
+            $mail->addAddress('jakariait@gmail.com');
+            $mail->addReplyTo($email, $name);
+
+            $mail->Subject = 'New Contact Form Submission from ' . htmlspecialchars($name);
+            $mail->Body = "Name: " . htmlspecialchars($name) . "\n";
+            $mail->Body .= "Email: " . htmlspecialchars($email) . "\n";
+            if (!empty($company)) {
+                $mail->Body .= "Company: " . htmlspecialchars($company) . "\n";
+            }
+            if (!empty($phone)) {
+                $mail->Body .= "Phone: " . htmlspecialchars($phone) . "\n";
+            }
+            $mail->Body .= "\nMessage:\n" . htmlspecialchars($message);
+
+            $mail->send();
+            $success = 'Thank you! Your message has been sent. We will be in touch soon.';
         }
+    } catch (\PHPMailer\PHPMailer\Exception $e) {
+        $error = 'Sorry, there was a problem sending your message. Please try again. Error: ' . $e->getMessage();
+    } catch (Throwable $e) {
+        $error = 'An error occurred: ' . $e->getMessage();
     }
 }
 ?>
@@ -59,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@300;400;500;600&display=swap"
       rel="stylesheet"
     />
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <script src="https://www.google.com/recaptcha/api.js?render=6LfEk6wsAAAAAKrSIykCLDGeow4kIzBJDNNSPcjN" async defer></script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       :root {
@@ -138,7 +168,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         border-color: var(--teal);
       }
       .form-group textarea { resize: vertical; min-height: 120px; }
-      .g-recaptcha { margin-bottom: 1.5rem; transform: scale(0.9); transform-origin: center; }
       .btn-submit {
         background: var(--teal);
         color: var(--navy);
@@ -154,6 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         width: 100%;
       }
       .btn-submit:hover { background: var(--white); transform: translateY(-2px); }
+      .btn-submit:disabled { opacity: 0.7; cursor: not-allowed; }
       .back-link { display: block; text-align: center; margin-top: 2rem; color: var(--teal); text-decoration: none; }
       .back-link:hover { text-decoration: underline; }
       @media (max-width: 680px) { .form-row { grid-template-columns: 1fr; } }
@@ -171,7 +201,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           <div class="error"><?php echo htmlspecialchars($error); ?></div>
         <?php endif; ?>
         
-        <form method="POST">
+        <form method="POST" id="contactForm">
+          <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response" />
           <div class="form-row">
             <div class="form-group">
               <label for="name">Your Name *</label>
@@ -196,11 +227,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="message">Message *</label>
             <textarea id="message" name="message" rows="5" required><?php echo isset($_POST['message']) ? htmlspecialchars($_POST['message']) : ''; ?></textarea>
           </div>
-          <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
           <button type="submit" class="btn-submit">Send Message →</button>
         </form>
         <a href="index.html" class="back-link">← Back to Home</a>
       <?php endif; ?>
     </div>
+    <script>
+      document.getElementById('contactForm').addEventListener('submit', function(e) {
+        var btn = e.target.querySelector('.btn-submit');
+        if (btn.disabled) return;
+        
+        btn.disabled = true;
+        btn.textContent = 'Sending...';
+        
+        e.preventDefault();
+        grecaptcha.ready(function() {
+          grecaptcha.execute('6LfEk6wsAAAAAKrSIykCLDGeow4kIzBJDNNSPcjN', {action: 'submit'}).then(function(token) {
+            document.getElementById('g-recaptcha-response').value = token;
+            e.target.submit();
+          }).catch(function() {
+            btn.disabled = false;
+            btn.textContent = 'Send Message →';
+          });
+        });
+      });
+    </script>
   </body>
 </html>

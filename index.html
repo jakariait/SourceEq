@@ -17,8 +17,12 @@
     <meta name="geo.region" content="US-CA" />
     <meta name="geo.placename" content="Los Angeles, California" />
 
-    <!-- Google reCAPTCHA -->
-    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+    <!-- Google reCAPTCHA v3 -->
+    <script
+      src="https://www.google.com/recaptcha/api.js?render=6LfEk6wsAAAAAKrSIykCLDGeow4kIzBJDNNSPcjN"
+      async
+      defer
+    ></script>
 
     <!-- Open Graph / Social Sharing -->
     <meta property="og:type" content="website" />
@@ -1503,22 +1507,48 @@
     </style>
     <script>
       function openContactModal() {
-        document.getElementById('contactModal').classList.add('open');
-        document.body.style.overflow = 'hidden';
+        document.getElementById("contactModal").classList.add("open");
+        document.body.style.overflow = "hidden";
       }
       function closeContactModal() {
-        document.getElementById('contactModal').classList.remove('open');
-        document.body.style.overflow = '';
+        document.getElementById("contactModal").classList.remove("open");
+        document.body.style.overflow = "";
       }
-      window.onclick = function(event) {
-        var modal = document.getElementById('contactModal');
+      window.onclick = function (event) {
+        var modal = document.getElementById("contactModal");
         if (event.target == modal) {
           closeContactModal();
         }
       };
-      document.addEventListener('keydown', function(e) {
-        if (e.key === 'Escape') closeContactModal();
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") closeContactModal();
       });
+
+      document
+        .querySelector(".contact-form")
+        .addEventListener("submit", function (e) {
+          var btn = e.target.querySelector(".btn-submit");
+          if (btn.disabled) return;
+
+          btn.disabled = true;
+          btn.textContent = "Sending...";
+
+          e.preventDefault();
+          grecaptcha.ready(function () {
+            grecaptcha
+              .execute("6LfEk6wsAAAAAKrSIykCLDGeow4kIzBJDNNSPcjN", {
+                action: "submit",
+              })
+              .then(function (token) {
+                document.getElementById("g-recaptcha-response").value = token;
+                e.target.submit();
+              })
+              .catch(function () {
+                btn.disabled = false;
+                btn.textContent = "Send Message →";
+              });
+          });
+        });
     </script>
   </head>
   <body>
@@ -1535,7 +1565,14 @@
         <li><a href="#disciplines">Disciplines</a></li>
         <li><a href="#process">Process</a></li>
         <li><a href="#why">Why Us</a></li>
-        <li><a href="#" class="nav-cta" onclick="openContactModal(); return false;">Start Now</a></li>
+        <li>
+          <a
+            href="#"
+            class="nav-cta"
+            onclick="openContactModal(); return false;"
+            >Start Now</a
+          >
+        </li>
       </ul>
     </nav>
 
@@ -1562,7 +1599,12 @@
           to build your dream team, we're ready to be your partner.
         </p>
         <div class="hero-actions">
-          <a href="#" class="btn-primary" onclick="openContactModal(); return false;">Start a Search →</a>
+          <a
+            href="#"
+            class="btn-primary"
+            onclick="openContactModal(); return false;"
+            >Start a Search →</a
+          >
           <a href="#process" class="btn-secondary">See How We Source ↓</a>
         </div>
         <div class="hero-stats">
@@ -2212,16 +2254,22 @@
     <section class="contact-section" id="contact">
       <div class="cta-strip">
         <h2>Ready to Find Your<br />Next A Player?</h2>
-        <button class="btn-dark" onclick="openContactModal()">Start a Conversation →</button>
+        <button class="btn-dark" onclick="openContactModal()">
+          Start a Conversation →
+        </button>
       </div>
     </section>
 
     <!-- Contact Modal -->
     <div id="contactModal" class="modal">
       <div class="modal-content">
-        <button class="modal-close" onclick="closeContactModal()">&times;</button>
+        <button class="modal-close" onclick="closeContactModal()">
+          &times;
+        </button>
         <h2>Get In Touch</h2>
-        <p class="modal-sub">Fill out the form below and we'll be in touch soon.</p>
+        <p class="modal-sub">
+          Fill out the form below and we'll be in touch soon.
+        </p>
         <form class="contact-form" action="contact.php" method="POST">
           <div class="form-row">
             <div class="form-group">
@@ -2245,9 +2293,18 @@
           </div>
           <div class="form-group">
             <label for="modal-message">Message *</label>
-            <textarea id="modal-message" name="message" rows="4" required></textarea>
+            <textarea
+              id="modal-message"
+              name="message"
+              rows="4"
+              required
+            ></textarea>
           </div>
-          <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+          <input
+            type="hidden"
+            id="g-recaptcha-response"
+            name="g-recaptcha-response"
+          />
           <button type="submit" class="btn-submit">Send Message →</button>
         </form>
       </div>
