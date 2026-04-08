@@ -17,6 +17,9 @@
     <meta name="geo.region" content="US-CA" />
     <meta name="geo.placename" content="Los Angeles, California" />
 
+    <!-- Google reCAPTCHA -->
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
     <!-- Open Graph / Social Sharing -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://www.sourceeq.com" />
@@ -1335,7 +1338,188 @@
         padding-left: 1.25rem;
         text-align: left;
       }
+
+      /* ── CONTACT FORM ── */
+      .contact-section {
+        background: var(--navy-2);
+        padding: 0;
+      }
+      .contact-section .cta-strip {
+        background: var(--teal);
+        padding: 5rem 4rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 3rem;
+      }
+      .contact-section .cta-strip h2 {
+        color: var(--navy);
+        font-size: clamp(2rem, 4vw, 3.5rem);
+        max-width: 600px;
+        margin-bottom: 0;
+      }
+      .cta-sub {
+        display: none;
+      }
+      .contact-form-wrap {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 3rem 4rem 4rem;
+      }
+      .contact-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+      }
+      .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+      }
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .form-group label {
+        font-size: 0.78rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        font-weight: 500;
+      }
+      .form-group input,
+      .form-group textarea {
+        background: var(--navy);
+        border: 1px solid rgba(56, 187, 231, 0.2);
+        padding: 0.9rem 1rem;
+        color: var(--text);
+        font-family: var(--font-body);
+        font-size: 1rem;
+        transition: border-color 0.2s;
+      }
+      .form-group input:focus,
+      .form-group textarea:focus {
+        outline: none;
+        border-color: var(--teal);
+      }
+      .form-group textarea {
+        resize: vertical;
+      }
+      .captcha-group {
+        max-width: 200px;
+      }
+      .btn-submit {
+        background: var(--teal);
+        color: var(--navy);
+        font-family: var(--font-display);
+        font-weight: 800;
+        font-size: 1rem;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        padding: 1rem 2.5rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s;
+        align-self: flex-start;
+      }
+      .btn-submit:hover {
+        background: var(--white);
+        transform: translateY(-2px);
+      }
+
+      @media (max-width: 1024px) {
+        .contact-form-wrap {
+          padding: 2rem;
+        }
+      }
+      @media (max-width: 680px) {
+        .form-row {
+          grid-template-columns: 1fr;
+        }
+        .btn-submit {
+          width: 100%;
+        }
+      }
+
+      /* ── MODAL ── */
+      .modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(3, 11, 20, 0.9);
+        backdrop-filter: blur(8px);
+      }
+      .modal.open {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .modal-content {
+        background: var(--navy-2);
+        border: 1px solid rgba(56, 187, 231, 0.2);
+        width: 90%;
+        max-width: 600px;
+        padding: 2.5rem;
+        position: relative;
+        max-height: 90vh;
+        overflow-y: auto;
+      }
+      .modal-close {
+        position: absolute;
+        top: 1rem;
+        right: 1.5rem;
+        background: none;
+        border: none;
+        color: var(--muted);
+        font-size: 2rem;
+        cursor: pointer;
+        line-height: 1;
+        transition: color 0.2s;
+      }
+      .modal-close:hover {
+        color: var(--teal);
+      }
+      .modal-content h2 {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: 1.75rem;
+        text-transform: uppercase;
+        color: var(--white);
+        margin-bottom: 0.5rem;
+      }
+      .modal-sub {
+        color: var(--muted);
+        margin-bottom: 2rem;
+        font-size: 1rem;
+      }
+      .contact-form-wrap {
+        display: none;
+      }
     </style>
+    <script>
+      function openContactModal() {
+        document.getElementById('contactModal').classList.add('open');
+        document.body.style.overflow = 'hidden';
+      }
+      function closeContactModal() {
+        document.getElementById('contactModal').classList.remove('open');
+        document.body.style.overflow = '';
+      }
+      window.onclick = function(event) {
+        var modal = document.getElementById('contactModal');
+        if (event.target == modal) {
+          closeContactModal();
+        }
+      };
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') closeContactModal();
+      });
+    </script>
   </head>
   <body>
     <!-- NAV -->
@@ -1351,7 +1535,7 @@
         <li><a href="#disciplines">Disciplines</a></li>
         <li><a href="#process">Process</a></li>
         <li><a href="#why">Why Us</a></li>
-        <li><a href="#contact" class="nav-cta">Start Now</a></li>
+        <li><a href="#" class="nav-cta" onclick="openContactModal(); return false;">Start Now</a></li>
       </ul>
     </nav>
 
@@ -1378,7 +1562,7 @@
           to build your dream team, we're ready to be your partner.
         </p>
         <div class="hero-actions">
-          <a href="#contact" class="btn-primary">Start a Search →</a>
+          <a href="#" class="btn-primary" onclick="openContactModal(); return false;">Start a Search →</a>
           <a href="#process" class="btn-secondary">See How We Source ↓</a>
         </div>
         <div class="hero-stats">
@@ -2025,11 +2209,48 @@
       </div>
     </section>
     <!-- CTA -->
-    <div class="cta-strip" id="contact">
-      <h2>Ready to Find Your<br />Next A Player?</h2>
-      <a href="mailto:info@sourceeq.com" class="btn-dark"
-        >Start a Conversation →</a
-      >
+    <section class="contact-section" id="contact">
+      <div class="cta-strip">
+        <h2>Ready to Find Your<br />Next A Player?</h2>
+        <button class="btn-dark" onclick="openContactModal()">Start a Conversation →</button>
+      </div>
+    </section>
+
+    <!-- Contact Modal -->
+    <div id="contactModal" class="modal">
+      <div class="modal-content">
+        <button class="modal-close" onclick="closeContactModal()">&times;</button>
+        <h2>Get In Touch</h2>
+        <p class="modal-sub">Fill out the form below and we'll be in touch soon.</p>
+        <form class="contact-form" action="contact.php" method="POST">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="modal-name">Your Name *</label>
+              <input type="text" id="modal-name" name="name" required />
+            </div>
+            <div class="form-group">
+              <label for="modal-email">Email Address *</label>
+              <input type="email" id="modal-email" name="email" required />
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="modal-company">Organization</label>
+              <input type="text" id="modal-company" name="company" />
+            </div>
+            <div class="form-group">
+              <label for="modal-phone">Phone</label>
+              <input type="tel" id="modal-phone" name="phone" />
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="modal-message">Message *</label>
+            <textarea id="modal-message" name="message" rows="4" required></textarea>
+          </div>
+          <div class="g-recaptcha" data-sitekey="YOUR_SITE_KEY_HERE"></div>
+          <button type="submit" class="btn-submit">Send Message →</button>
+        </form>
+      </div>
     </div>
 
     <!-- FOOTER -->
