@@ -259,9 +259,10 @@
       /* ── HERO ── */
       .hero {
         min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 4rem;
+        align-items: center;
         padding: 120px 4rem 80px;
         position: relative;
         overflow: hidden;
@@ -295,6 +296,19 @@
         position: relative;
         z-index: 1;
         max-width: 1100px;
+      }
+      .hero-stats {
+        position: absolute;
+        right: 4rem;
+        top: 50%;
+        transform: translateY(-50%);
+        display: flex;
+        flex-direction: column;
+        gap: 2.5rem;
+        padding: 3rem;
+        border-left: 1px solid rgba(0, 191, 255, 0.1);
+        border-top: none;
+        margin-top: 0;
       }
       .hero-tag {
         display: inline-flex;
@@ -935,6 +949,18 @@
         .hero {
           padding-left: 2rem;
           padding-right: 2rem;
+          grid-template-columns: 1fr;
+        }
+        .hero-stats {
+          position: relative;
+          right: auto;
+          top: auto;
+          transform: none;
+          border-left: none;
+          border-top: 1px solid rgba(0, 191, 255, 0.1);
+          padding-top: 2rem;
+          flex-direction: row;
+          flex-wrap: wrap;
         }
         .mission {
           grid-template-columns: 1fr;
@@ -968,8 +994,19 @@
           grid-template-columns: 1fr;
         }
         .hero-stats {
+          position: relative;
+          right: auto;
+          top: auto;
+          transform: none;
+          flex-direction: row;
           flex-wrap: wrap;
           gap: 1.5rem;
+          border-left: none;
+          border-top: 1px solid rgba(0, 191, 255, 0.1);
+          padding-top: 2rem;
+        }
+        .hero {
+          grid-template-columns: 1fr;
         }
         .nav-links {
           display: none;
@@ -1381,23 +1418,23 @@
           <a href="#contact" class="btn-primary">Start a Search →</a>
           <a href="#process" class="btn-secondary">See How We Source ↓</a>
         </div>
-        <div class="hero-stats">
-          <div>
-            <div class="stat-num">100K+</div>
-            <div class="stat-label">Healthcare Professionals</div>
-          </div>
-          <div>
-            <div class="stat-num">20+</div>
-            <div class="stat-label">Years of Expertise</div>
-          </div>
-          <div>
-            <div class="stat-num">500+</div>
-            <div class="stat-label">Great Hires Since 2018</div>
-          </div>
-          <div>
-            <div class="stat-num">All</div>
-            <div class="stat-label">Healthcare Sectors</div>
-          </div>
+      </div>
+      <div class="hero-stats">
+        <div>
+          <div class="stat-num">100K+</div>
+          <div class="stat-label">Healthcare Professionals</div>
+        </div>
+        <div>
+          <div class="stat-num">20+</div>
+          <div class="stat-label">Years of Expertise</div>
+        </div>
+        <div>
+          <div class="stat-num">500+</div>
+          <div class="stat-label">Great Hires Since 2018</div>
+        </div>
+        <div>
+          <div class="stat-num">All</div>
+          <div class="stat-label">Healthcare Sectors</div>
         </div>
       </div>
     </section>
